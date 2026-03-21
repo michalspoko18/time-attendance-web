@@ -1,11 +1,12 @@
 <script lang="ts">
+  import axios from 'axios';
+  import { api } from './lib/api';
+
   let email = '';
   let password = '';
   let loading = false;
   let error = '';
   let success = '';
-
-  const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
   async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
@@ -20,32 +21,23 @@
     loading = true;
 
     try {
-      const response = await fetch(`${API_BASE}/api/auth/login/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: email.trim(),
-          password
-        })
+      const response = await api.post('/api/auth/login/', {
+        email: email.trim(),
+        password
       });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        error = data.detail ?? 'Nie udało się zalogować.';
-        return;
-      }
+      const data = response.data ?? {};
 
       if (data?.access) {
         localStorage.setItem('accessToken', data.access);
       }
 
       success = 'Logowanie zakończone sukcesem.';
-    } catch {
-      error = 'Błąd połączenia z API.';
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        error = err.response?.data?.detail ?? 'Nie udało się zalogować.';
+      } else {
+        error = 'Błąd połączenia z API.';
+      }
     } finally {
       loading = false;
     }
