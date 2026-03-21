@@ -1,89 +1,94 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<script lang="ts">
+  let email = '';
+  let password = '';
+  let loading = false;
+  let error = '';
+  let success = '';
+
+  const API_BASE = import.meta.env.VITE_API_URL ?? '';
+
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+    error = '';
+    success = '';
+
+    if (!email.trim() || !password.trim()) {
+      error = 'Uzupełnij email i hasło.';
+      return;
+    }
+
+    loading = true;
+
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/login/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: email.trim(),
+          password
+        })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        error = data.detail ?? 'Nie udało się zalogować.';
+        return;
+      }
+
+      if (data?.access) {
+        localStorage.setItem('accessToken', data.access);
+      }
+
+      success = 'Logowanie zakończone sukcesem.';
+    } catch {
+      error = 'Błąd połączenia z API.';
+    } finally {
+      loading = false;
+    }
+  }
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<main class="login-page">
+  <section class="login-card" aria-labelledby="login-title">
+    <h1 id="login-title">Sign in</h1>
+    <p class="subtitle">Sign in to your account</p>
 
-<div class="ticks"></div>
+    <form class="form" on:submit={handleSubmit}>
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        bind:value={email}
+        placeholder="m@example.com"
+        autocomplete="email"
+        required
+      />
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        bind:value={password}
+        placeholder="******"
+        autocomplete="current-password"
+        required
+      />
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+      {#if error}
+        <p class="feedback error" role="alert">{error}</p>
+      {/if}
+
+      {#if success}
+        <p class="feedback success" role="status">{success}</p>
+      {/if}
+
+      <button type="submit" disabled={loading}>
+        {#if loading}Signing in...{:else}Continue{/if}
+      </button>
+    </form>
+  </section>
+</main>
