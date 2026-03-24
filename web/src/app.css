@@ -39,8 +39,25 @@ body {
   padding: 24px;
 }
 
+.dashboard-page {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
 .login-card {
   width: min(560px, 100%);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #e5ebf0 0%, var(--card-bg) 100%);
+  padding: 28px;
+  box-shadow: 0 12px 30px rgba(84, 99, 114, 0.14);
+}
+
+.dashboard-card {
+  width: min(960px, 100%);
+  min-height: 72svh;
   border: 1.5px solid var(--border);
   border-radius: 20px;
   background: linear-gradient(180deg, #e5ebf0 0%, var(--card-bg) 100%);
@@ -140,7 +157,17 @@ button:disabled {
     padding: 16px;
   }
 
+  .dashboard-page {
+    padding: 16px;
+  }
+
   .login-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .dashboard-card {
+    min-height: 70svh;
     padding: 20px;
     border-radius: 16px;
   }
