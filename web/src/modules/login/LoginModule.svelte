@@ -2,6 +2,7 @@
   import axios from 'axios';
   import { createEventDispatcher } from 'svelte';
   import { api } from '../../lib/api';
+  import { setAccessToken } from '../../lib/auth';
 
   const dispatch = createEventDispatcher<{ loginSuccess: void }>();
 
@@ -33,7 +34,7 @@
         return;
       }
 
-      localStorage.setItem('accessToken', data.access);
+      setAccessToken(data.access);
       dispatch('loginSuccess');
     } catch (err) {
       if (axios.isAxiosError(err)) {
