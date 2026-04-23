@@ -1,6 +1,7 @@
 <script lang="ts">
   import axios from 'axios';
   import { createEventDispatcher } from 'svelte';
+  import heroImage from '../../assets/hero.png';
   import { api } from '../../lib/api';
   import { setAccessToken } from '../../lib/auth';
 
@@ -49,38 +50,50 @@
 </script>
 
 <main class="login-page">
-  <section class="login-card" aria-labelledby="login-title">
-    <h1 id="login-title">Sign in</h1>
-    <p class="subtitle">Sign in to your account</p>
+  <section class="login-shell" aria-labelledby="login-title">
+    <aside class="login-brand">
+      <p class="eyebrow">Time Attendance</p>
+      <h1 class="brand-title">Lepsza kontrola czasu pracy</h1>
+      <p class="brand-copy">
+        Monitoruj obecność, analizuj trendy i obsługuj grafik zespołu w jednym miejscu.
+      </p>
+      <img src={heroImage} alt="Ilustracja panelu pracy" class="brand-art" />
+    </aside>
 
-    <form class="form" on:submit={handleSubmit}>
-      <label for="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        bind:value={email}
-        placeholder="m@example.com"
-        autocomplete="email"
-        required
-      />
+    <article class="login-card">
+      <p class="eyebrow">Welcome back</p>
+      <h2 id="login-title">Zaloguj się</h2>
+      <p class="subtitle">Użyj danych konta, aby przejść do panelu.</p>
 
-      <label for="password">Password</label>
-      <input
-        id="password"
-        type="password"
-        bind:value={password}
-        placeholder="******"
-        autocomplete="current-password"
-        required
-      />
+      <form class="form" on:submit={handleSubmit}>
+        <label for="email">Adres email</label>
+        <input
+          id="email"
+          type="email"
+          bind:value={email}
+          placeholder="m@example.com"
+          autocomplete="email"
+          required
+        />
 
-      {#if error}
-        <p class="feedback error" role="alert">{error}</p>
-      {/if}
+        <label for="password">Hasło</label>
+        <input
+          id="password"
+          type="password"
+          bind:value={password}
+          placeholder="Wpisz hasło"
+          autocomplete="current-password"
+          required
+        />
 
-      <button type="submit" disabled={loading}>
-        {#if loading}Signing in...{:else}Continue{/if}
-      </button>
-    </form>
+        {#if error}
+          <p class="feedback error" role="alert">{error}</p>
+        {/if}
+
+        <button type="submit" disabled={loading}>
+          {#if loading}Trwa logowanie...{:else}Przejdź do panelu{/if}
+        </button>
+      </form>
+    </article>
   </section>
 </main>
