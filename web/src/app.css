@@ -82,16 +82,18 @@ p {
   min-height: 100svh;
   display: grid;
   align-items: center;
+  justify-items: center;
   padding: clamp(18px, 2.4vw, 34px);
 }
 
 .login-shell {
   width: min(1120px, 100%);
+  max-height: calc(100svh - clamp(36px, 4.8vw, 68px));
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: auto;
   border: 1px solid var(--border);
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -121,6 +123,8 @@ p {
 
 .brand-art {
   width: min(430px, 100%);
+  max-height: clamp(210px, 34svh, 330px);
+  object-fit: cover;
   margin-top: 8px;
   border-radius: 18px;
   border: 1px solid #d8ccb6;
@@ -131,6 +135,7 @@ p {
   padding: clamp(24px, 3vw, 40px);
   display: grid;
   align-content: center;
+  min-width: 0;
 }
 
 .form {
@@ -387,10 +392,12 @@ time {
 @media (max-width: 1020px) {
   .login-shell {
     grid-template-columns: 1fr;
+    width: min(720px, 100%);
   }
 
   .brand-art {
     max-width: 360px;
+    max-height: 240px;
   }
 
   .dashboard-grid {
@@ -409,10 +416,34 @@ time {
   .login-page,
   .dashboard-page {
     padding: 12px;
+    align-items: start;
+  }
+
+  .login-shell {
+    max-height: none;
+    border-radius: 18px;
   }
 
   .login-brand {
-    padding-bottom: 20px;
+    padding: 22px 20px 18px;
+  }
+
+  .brand-title {
+    font-size: clamp(1.6rem, 9vw, 2.1rem);
+  }
+
+  .brand-copy {
+    font-size: 0.98rem;
+  }
+
+  .brand-art {
+    width: 100%;
+    max-width: none;
+    max-height: 180px;
+  }
+
+  .login-card {
+    padding: 22px 20px 24px;
   }
 
   .dashboard-header {
@@ -433,6 +464,44 @@ time {
 
   .stats {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-page,
+  .dashboard-page {
+    padding: 8px;
+  }
+
+  .login-shell {
+    border-radius: 14px;
+  }
+
+  .login-brand,
+  .login-card {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .brand-art {
+    max-height: 140px;
+  }
+
+  input,
+  button {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-height: 720px) and (min-width: 1021px) {
+  .login-brand,
+  .login-card {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .brand-art {
+    max-height: 220px;
   }
 }
 
@@ -1099,4 +1168,3 @@ time {
     grid-template-columns: 1fr 1fr;
   }
 }
-
