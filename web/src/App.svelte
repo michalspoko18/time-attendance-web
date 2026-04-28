@@ -1,18 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import DashboardModule from './modules/dashboard/DashboardModule.svelte';
   import LoginModule from './modules/login/LoginModule.svelte';
   import ManagerLayout from './modules/manager/ManagerLayout.svelte';
   import { api } from './lib/api';
-  import { getAccessToken } from './lib/auth';
+  import { clearSession, getAccessToken } from './lib/auth';
 
   const LOGIN_ROUTE = '/login';
-  const DASHBOARD_ROUTE = '/dashboard';
   const MANAGER_ROUTES_PREFIX = '/manager';
+  const MANAGER_DASHBOARD_ROUTE = '/manager/dashboard';
 
   let isAuthenticated = Boolean(getAccessToken());
   let isManager = false;
   let currentPath = '/';
+  let loginError = '';
 
   function navigate(path: string, replace = false) {
     if (window.location.pathname === path) {
@@ -30,12 +30,20 @@
   }
 
   function defaultAuthRoute() {
-    return isManager ? '/manager/dashboard' : DASHBOARD_ROUTE;
+    return MANAGER_DASHBOARD_ROUTE;
+  }
+
+  function denyAccessForNonManager() {
+    loginError = 'Dostęp do aplikacji jest dostępny tylko dla managerów.';
+    isAuthenticated = false;
+    isManager = false;
+    clearSession();
+    navigate(LOGIN_ROUTE, true);
   }
 
   function syncRouteWithAuth(replace = true) {
     const isManagerRoute = currentPath.startsWith(MANAGER_ROUTES_PREFIX);
-    const isKnownPublicRoute = currentPath === LOGIN_ROUTE || currentPath === DASHBOARD_ROUTE;
+    const isKnownPublicRoute = currentPath === LOGIN_ROUTE;
 
     if (!isAuthenticated) {
       if (currentPath !== LOGIN_ROUTE) {
@@ -44,13 +52,13 @@
       return;
     }
 
-    if (currentPath === LOGIN_ROUTE) {
-      navigate(defaultAuthRoute(), replace);
+    if (!isManager) {
+      denyAccessForNonManager();
       return;
     }
 
-    if (isManagerRoute && !isManager) {
-      navigate(DASHBOARD_ROUTE, true);
+    if (currentPath === LOGIN_ROUTE) {
+      navigate(defaultAuthRoute(), replace);
       return;
     }
 
@@ -80,7 +88,14 @@
 
   async function handleLoginSuccess() {
     isAuthenticated = true;
+    loginError = '';
     await fetchMe();
+
+    if (!isManager) {
+      denyAccessForNonManager();
+      return;
+    }
+
     navigate(defaultAuthRoute());
   }
 
@@ -118,8 +133,6 @@
 
 {#if currentPath.startsWith(MANAGER_ROUTES_PREFIX) && isAuthenticated && isManager}
   <ManagerLayout {currentPath} {navigate} />
-{:else if currentPath === DASHBOARD_ROUTE && isAuthenticated}
-  <DashboardModule />
 {:else}
-  <LoginModule on:loginSuccess={handleLoginSuccess} />
+  <LoginModule {loginError} on:loginSuccess={handleLoginSuccess} />
 {/if}
