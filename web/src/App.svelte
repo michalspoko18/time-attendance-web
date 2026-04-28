@@ -2,13 +2,16 @@
   import { onMount } from 'svelte';
   import DashboardModule from './modules/dashboard/DashboardModule.svelte';
   import LoginModule from './modules/login/LoginModule.svelte';
+  import ManagerLayout from './modules/manager/ManagerLayout.svelte';
+  import { api } from './lib/api';
   import { getAccessToken } from './lib/auth';
 
   const LOGIN_ROUTE = '/login';
   const DASHBOARD_ROUTE = '/dashboard';
-  const KNOWN_ROUTES = new Set([LOGIN_ROUTE, DASHBOARD_ROUTE]);
+  const MANAGER_ROUTES_PREFIX = '/manager';
 
   let isAuthenticated = Boolean(getAccessToken());
+  let isManager = false;
   let currentPath = '/';
 
   function navigate(path: string, replace = false) {
@@ -26,36 +29,64 @@
     currentPath = path;
   }
 
+  function defaultAuthRoute() {
+    return isManager ? '/manager/dashboard' : DASHBOARD_ROUTE;
+  }
+
   function syncRouteWithAuth(replace = true) {
-    const isKnownRoute = KNOWN_ROUTES.has(currentPath);
+    const isManagerRoute = currentPath.startsWith(MANAGER_ROUTES_PREFIX);
+    const isKnownPublicRoute = currentPath === LOGIN_ROUTE || currentPath === DASHBOARD_ROUTE;
 
-    if (!isKnownRoute) {
-      navigate(isAuthenticated ? DASHBOARD_ROUTE : LOGIN_ROUTE, true);
+    if (!isAuthenticated) {
+      if (currentPath !== LOGIN_ROUTE) {
+        navigate(LOGIN_ROUTE, true);
+      }
       return;
     }
 
-    if (isAuthenticated && currentPath === LOGIN_ROUTE) {
-      navigate(DASHBOARD_ROUTE, replace);
+    if (currentPath === LOGIN_ROUTE) {
+      navigate(defaultAuthRoute(), replace);
       return;
     }
 
-    if (!isAuthenticated && currentPath === DASHBOARD_ROUTE) {
-      navigate(LOGIN_ROUTE, true);
+    if (isManagerRoute && !isManager) {
+      navigate(DASHBOARD_ROUTE, true);
+      return;
+    }
+
+    if (!isKnownPublicRoute && !isManagerRoute) {
+      navigate(defaultAuthRoute(), true);
+    }
+  }
+
+  async function fetchMe() {
+    try {
+      const response = await api.get('/api/auth/me/');
+      isManager = response.data?.is_manager ?? false;
+    } catch {
+      isManager = false;
     }
   }
 
   function syncAuthState() {
     isAuthenticated = Boolean(getAccessToken());
-    syncRouteWithAuth(true);
+    if (isAuthenticated) {
+      fetchMe().then(() => syncRouteWithAuth(true));
+    } else {
+      isManager = false;
+      syncRouteWithAuth(true);
+    }
   }
 
-  function handleLoginSuccess() {
+  async function handleLoginSuccess() {
     isAuthenticated = true;
-    navigate(DASHBOARD_ROUTE);
+    await fetchMe();
+    navigate(defaultAuthRoute());
   }
 
   function handleLogout() {
     isAuthenticated = false;
+    isManager = false;
     navigate(LOGIN_ROUTE, true);
   }
 
@@ -66,7 +97,12 @@
     };
 
     currentPath = window.location.pathname;
-    syncRouteWithAuth(true);
+
+    const init = isAuthenticated
+      ? fetchMe().then(() => syncRouteWithAuth(true))
+      : Promise.resolve(syncRouteWithAuth(true));
+
+    void init;
 
     window.addEventListener('auth:login', syncAuthState);
     window.addEventListener('auth:logout', handleLogout);
@@ -80,7 +116,9 @@
   });
 </script>
 
-{#if currentPath === DASHBOARD_ROUTE}
+{#if currentPath.startsWith(MANAGER_ROUTES_PREFIX) && isAuthenticated && isManager}
+  <ManagerLayout {currentPath} {navigate} />
+{:else if currentPath === DASHBOARD_ROUTE && isAuthenticated}
   <DashboardModule />
 {:else}
   <LoginModule on:loginSuccess={handleLoginSuccess} />
