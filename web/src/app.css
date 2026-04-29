@@ -725,6 +725,150 @@ time {
 .dashboard-stat.blue .tile-icon { color: #2563ff; }
 .dashboard-stat.orange .tile-icon { color: #ff4d00; }
 
+/* Daily view */
+.daily-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.daily-stat.green .tile-value,
+.daily-stat.green .tile-icon {
+  color: #00aa45;
+}
+
+.daily-stat.orange .tile-value,
+.daily-stat.orange .tile-icon {
+  color: #ff4d00;
+}
+
+.daily-stat.blue .tile-value,
+.daily-stat.blue .tile-icon {
+  color: #2563ff;
+}
+
+.daily-list-panel {
+  padding: 22px;
+  gap: 18px;
+  border-color: #e2e8f0;
+  background: #fff;
+}
+
+.daily-list-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.daily-list-head h2 {
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  color: #111827;
+}
+
+.table-search {
+  width: min(280px, 100%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.table-search:focus-within {
+  border-color: #cbd5e1;
+  box-shadow: 0 0 0 3px rgba(139, 0, 255, 0.12);
+}
+
+.table-search input {
+  min-width: 0;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.86rem;
+}
+
+.table-search input:focus-visible {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.table-wrap.daily-table-wrap {
+  border-color: #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.data-table.daily-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  text-transform: none;
+  border-bottom-color: #e2e8f0;
+  font-weight: 700;
+}
+
+.data-table.daily-table td {
+  border-bottom-color: #edf2f7;
+  color: #1f2937;
+}
+
+.data-table.daily-table tbody tr {
+  cursor: pointer;
+}
+
+.data-table.daily-table tbody tr:hover td {
+  background: #faf5ff;
+}
+
+.data-table.daily-table tbody tr:focus-visible {
+  outline: 3px solid rgba(139, 0, 255, 0.18);
+  outline-offset: -3px;
+}
+
+.daily-table .mono {
+  color: #475569;
+}
+
+.daily-table .person-name {
+  color: #111827;
+}
+
+.daily-table .person-meta {
+  color: #64748b;
+}
+
+.daily-table .badge.in {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.daily-table .badge.out {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.daily-table .badge.absent {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.avatar.compact {
+  width: 32px;
+  height: 32px;
+  font-size: 0.82rem;
+  background: #f0ddff;
+  color: #7e22ce;
+}
+
 /* Dashboard grid */
 .dash-grid {
   display: grid;
