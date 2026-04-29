@@ -41,6 +41,8 @@
   $: topWorkers = [...workedToday]
     .sort((a, b) => b.today_seconds - a.today_seconds)
     .slice(0, 3);
+  $: visiblePresentCount = Math.min(presentToday.length, 5);
+  $: equalPanelRows = visiblePresentCount > 0 && visiblePresentCount === topWorkers.length;
   $: avgHours =
     workedToday.length > 0
       ? workedToday.reduce((sum, entry) => sum + entry.today_seconds, 0) / workedToday.length / 3600
@@ -121,7 +123,7 @@
       </article>
     </div>
 
-    <div class="dash-grid">
+    <div class="dash-grid" class:equal-panels={equalPanelRows}>
       <article class="panel">
         <div class="panel-head">
           <div>
