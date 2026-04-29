@@ -37,10 +37,10 @@
   }
 
   $: presentToday = dailyEntries.filter((entry) => entry.status === 'in');
-  $: topWorkers = [...presentToday]
+  $: workedToday = dailyEntries.filter((entry) => entry.today_seconds > 0);
+  $: topWorkers = [...workedToday]
     .sort((a, b) => b.today_seconds - a.today_seconds)
     .slice(0, 3);
-  $: workedToday = dailyEntries.filter((entry) => entry.today_seconds > 0);
   $: avgHours =
     workedToday.length > 0
       ? workedToday.reduce((sum, entry) => sum + entry.today_seconds, 0) / workedToday.length / 3600
