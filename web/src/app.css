@@ -609,14 +609,19 @@ time {
 }
 
 .nav-link:hover:enabled {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: #f7edff;
+  color: #7e22ce;
   transform: none;
 }
 
 .nav-link.active {
   background: #f0ddff;
   color: #8b00ff;
+}
+
+.nav-link.active:hover:enabled {
+  background: #ead0ff;
+  color: #7e22ce;
 }
 
 .nav-link.logout {
