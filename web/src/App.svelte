@@ -3,6 +3,7 @@
   import LoginModule from './modules/login/LoginModule.svelte';
   import ManagerLayout from './modules/manager/ManagerLayout.svelte';
   import { api } from './lib/api';
+  import type { AuthUser } from './lib/api';
   import { clearSession, getAccessToken } from './lib/auth';
 
   const LOGIN_ROUTE = '/login';
@@ -11,6 +12,7 @@
 
   let isAuthenticated = Boolean(getAccessToken());
   let isManager = false;
+  let currentUser: AuthUser | null = null;
   let currentPath = '/';
   let loginError = '';
 
@@ -37,6 +39,7 @@
     loginError = 'Dostęp do aplikacji jest dostępny tylko dla managerów.';
     isAuthenticated = false;
     isManager = false;
+    currentUser = null;
     clearSession();
     navigate(LOGIN_ROUTE, true);
   }
@@ -69,9 +72,11 @@
 
   async function fetchMe() {
     try {
-      const response = await api.get('/api/auth/me/');
-      isManager = response.data?.is_manager ?? false;
+      const response = await api.get<AuthUser>('/api/auth/me/');
+      currentUser = response.data;
+      isManager = currentUser?.is_manager ?? false;
     } catch {
+      currentUser = null;
       isManager = false;
     }
   }
@@ -82,6 +87,7 @@
       fetchMe().then(() => syncRouteWithAuth(true));
     } else {
       isManager = false;
+      currentUser = null;
       syncRouteWithAuth(true);
     }
   }
@@ -102,6 +108,7 @@
   function handleLogout() {
     isAuthenticated = false;
     isManager = false;
+    currentUser = null;
     navigate(LOGIN_ROUTE, true);
   }
 
@@ -132,7 +139,7 @@
 </script>
 
 {#if currentPath.startsWith(MANAGER_ROUTES_PREFIX) && isAuthenticated && isManager}
-  <ManagerLayout {currentPath} {navigate} />
+  <ManagerLayout {currentPath} {navigate} {currentUser} />
 {:else}
   <LoginModule {loginError} on:loginSuccess={handleLoginSuccess} />
 {/if}

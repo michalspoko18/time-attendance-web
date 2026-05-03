@@ -4,12 +4,15 @@
   import DailyView from './daily/DailyView.svelte';
   import UsersView from './users/UsersView.svelte';
   import UserDetailView from './users/UserDetailView.svelte';
+  import type { AuthUser } from '../../lib/api';
 
   export let currentPath: string;
   export let navigate: (path: string, replace?: boolean) => void;
+  export let currentUser: AuthUser | null = null;
 
   $: activeView = resolveView(currentPath);
   $: selectedEmployeeId = resolveEmployeeId(currentPath);
+  $: managerDisplayName = getDisplayName(currentUser);
 
   function resolveView(path: string): 'dashboard' | 'daily' | 'users' | 'user-detail' {
     if (path.startsWith('/manager/users/') && path.length > '/manager/users/'.length) {
@@ -28,6 +31,18 @@
     return '';
   }
 
+  function getDisplayName(user: AuthUser | null): string {
+    if (!user) {
+      return 'Manager';
+    }
+
+    const firstName = user.first_name?.trim() ?? '';
+    const lastName = user.last_name?.trim() ?? '';
+    const fullNameFromParts = `${firstName} ${lastName}`.trim();
+
+    return fullNameFromParts || user.full_name || user.name || user.username || 'Manager';
+  }
+
   const navItems = [
     { label: 'Dashboard', path: '/manager/dashboard', view: 'dashboard' },
     { label: 'Dziś w pracy', path: '/manager/daily', view: 'daily' },
@@ -43,7 +58,7 @@
   <nav class="manager-sidebar" aria-label="Manager navigation">
     <div class="sidebar-brand">
       <p class="brand-name">Panel Managera</p>
-      <p class="brand-role">Administrator</p>
+      <p class="brand-role">{managerDisplayName}</p>
     </div>
 
     <ul class="sidebar-nav" role="list">

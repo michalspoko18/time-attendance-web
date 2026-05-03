@@ -8,6 +8,20 @@ export const api = axios.create({
   withCredentials: true
 });
 
+export interface AuthUser {
+  id: number;
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  name?: string;
+  email?: string;
+  employee_id?: string;
+  employment?: string;
+  is_active?: boolean;
+  is_manager?: boolean;
+}
+
 const refreshClient = axios.create({
   baseURL,
   withCredentials: true
