@@ -7,10 +7,18 @@
 
   const dispatch = createEventDispatcher<{ loginSuccess: void }>();
 
+  export let loginError = '';
+
   let email = '';
   let password = '';
   let loading = false;
   let error = '';
+  let lastLoginError = '';
+
+  $: if (loginError && loginError !== lastLoginError) {
+    error = loginError;
+    lastLoginError = loginError;
+  }
 
   async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
